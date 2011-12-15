@@ -26,9 +26,23 @@
 // prevents me getting crazy
 typedef void(^PSSVSimpleBlock)(void);
 
-@interface PSStackedViewController() <UIGestureRecognizerDelegate> 
-@property(nonatomic, retain) UIViewController *rootViewController;
-@property(nonatomic, assign) NSMutableArray* viewControllers;
+@interface PSStackedViewController() <UIGestureRecognizerDelegate> {
+    NSMutableArray *viewControllers_;
+    // internal drag state handling and other messy details
+    PSSVSnapOption lastDragOption_;
+    BOOL snapBackFromLeft_;
+    NSInteger lastDragOffset_;
+    BOOL lastDragDividedOne_;
+    NSInteger lastVisibleIndexBeforeRotation_;    
+    struct {
+        unsigned int delegateWillInsertViewController:1;
+        unsigned int delegateDidInsertViewController:1;
+        unsigned int delegateWillRemoveViewController:1;
+        unsigned int delegateDidRemoveViewController:1;        
+    }delegateFlags_;
+}
+@property(nonatomic, strong) UIViewController *rootViewController;
+@property(nonatomic, strong) NSMutableArray *viewControllers;
 @property(nonatomic, assign) NSInteger firstVisibleIndex;
 @property(nonatomic, assign) CGFloat floatIndex;
 - (UIViewController *)overlappedViewController;
@@ -55,7 +69,7 @@ typedef void(^PSSVSimpleBlock)(void);
 
 - (id)initWithRootViewController:(UIViewController *)rootViewController; {
     if ((self = [super init])) {
-        rootViewController_ = [rootViewController retain];
+        rootViewController_ = rootViewController;
         viewControllers_ = [[NSMutableArray alloc] init];
         
         // set some reasonble defaults
@@ -63,7 +77,7 @@ typedef void(^PSSVSimpleBlock)(void);
         largeLeftInset_ = 200;
         
         // add a gesture recognizer to detect dragging to the guest controllers
-        UIPanGestureRecognizer *panRecognizer = [[[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePanFrom:)] autorelease];
+        UIPanGestureRecognizer *panRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePanFrom:)];
         [panRecognizer setMaximumNumberOfTouches:1];
         [panRecognizer setDelaysTouchesBegan:NO];
         [panRecognizer setDelaysTouchesEnded:YES];
@@ -92,10 +106,6 @@ typedef void(^PSSVSimpleBlock)(void);
         [self popViewControllerAnimated:NO];
     }
     
-    [panRecognizer_ release];
-    [rootViewController_ release];
-    [viewControllers_ release];
-    [super dealloc];
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -566,7 +576,7 @@ enum {
         }
     }];
     
-    return [[array copy] autorelease];
+    return [array copy];
 }
 
 
