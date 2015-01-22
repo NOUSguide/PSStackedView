@@ -35,7 +35,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma mark -
 #pragma mark private
-
+/*
 // creates vertical shadow
 - (CAGradientLayer *)shadowAsInverse:(BOOL)inverse {
 	CAGradientLayer *newShadow = [[CAGradientLayer alloc] init];
@@ -52,6 +52,7 @@
     CFRelease(lightColor);
 	return newShadow;
 }
+ */
 
 // return available shadows as set, for easy enumeration
 - (NSSet *)shadowSet {
@@ -172,8 +173,8 @@
     
     if (shadow & PSSVSideLeft) {
         if (!self.leftShadowLayer) {
-            CAGradientLayer *leftShadow = [self shadowAsInverse:YES];
-            self.leftShadowLayer = leftShadow;
+           // CAGradientLayer *leftShadow = [self shadowAsInverse:YES];
+           // self.leftShadowLayer = leftShadow;
         }
         self.leftShadowLayer.frame = CGRectMake(-kPSSVShadowWidth, 0, kPSSVShadowWidth+kPSSVCornerRadius, self.controller.view.height);;
         if ([self.layer.sublayers indexOfObjectIdenticalTo:self.leftShadowLayer] != 0) {
@@ -185,8 +186,8 @@
     
     if (shadow & PSSVSideRight) {
         if (!self.rightShadowLayer) {
-            CAGradientLayer *rightShadow = [self shadowAsInverse:NO];
-            self.rightShadowLayer = rightShadow;
+          //  CAGradientLayer *rightShadow = [self shadowAsInverse:NO];
+          //  self.rightShadowLayer = rightShadow;
         }
         self.rightShadowLayer.frame = CGRectMake(self.width-kPSSVCornerRadius, 0, kPSSVShadowWidth, self.controller.view.height);
         if ([self.layer.sublayers indexOfObjectIdenticalTo:self.rightShadowLayer] != 0) {
